@@ -1,9 +1,12 @@
 package main
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+
+	"example.com/webservice/models"
 )
 
 func main() {
@@ -21,12 +24,30 @@ func main() {
 		v1.OPTIONS("person", options)
 	}
 
+	err := models.ConnectDatabase()
+	checkErr(err)
+
 	r.Run()
 
 }
 
+func checkErr(err error) {
+	if err != nil {
+		log.Println("Error:", err)
+	}
+}
+
 func getPersons(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"msg": "Persons Çağırıldı (GET)"})
+
+	persons, err := models.GetPersons(10)
+	checkErr(err)
+
+	if persons == nil {
+		c.JSON(http.StatusBadRequest, gin.H{"Hata": "Kayıt bulunamadı"})
+		return
+	} else {
+		c.JSON(http.StatusOK, gin.H{"data": persons})
+	}
 }
 
 func getPersonById(c *gin.Context) {

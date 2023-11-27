@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 
@@ -83,7 +84,27 @@ func addPerson(c *gin.Context) {
 }
 
 func updatePerson(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"msg": "Person Güncellendi (PUT)"})
+
+	var json models.Person
+
+	if err := c.ShouldBindJSON(&json); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"HATA": err.Error()})
+		return
+	}
+
+	personId, err := strconv.Atoi(c.Param("id"))
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"HATA": "GEÇERSİZ ID !"})
+	}
+
+	success, err := models.UpdatePerson(json, personId)
+
+	if success {
+		c.JSON(http.StatusOK, gin.H{"MSG": "BAŞARILI !!! BİLGİLER DEĞİŞTİRİLDİ"})
+	} else {
+		c.JSON(http.StatusBadRequest, gin.H{"HATA": err})
+	}
 }
 
 func deletePerson(c *gin.Context) {

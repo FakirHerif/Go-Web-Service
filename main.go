@@ -65,7 +65,21 @@ func getPersonById(c *gin.Context) {
 }
 
 func addPerson(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"msg": "Person Eklendi (POST)"})
+
+	var json models.Person
+
+	if err := c.ShouldBindJSON(&json); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"Hata": err.Error()})
+		return
+	}
+
+	success, err := models.AddPerson(json)
+
+	if success {
+		c.JSON(http.StatusOK, gin.H{"MSG": "BAŞARILI !!! PERSON EKLENDİ"})
+	} else {
+		c.JSON(http.StatusBadRequest, gin.H{"HATA": err})
+	}
 }
 
 func updatePerson(c *gin.Context) {

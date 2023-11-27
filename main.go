@@ -125,5 +125,9 @@ func deletePerson(c *gin.Context) {
 }
 
 func options(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"msg": "Options Çağırıldı (OPTIONS)"})
+	secenekler := "200 OK\n" +
+		"METOTLAR: GET,POST,PUT,DELETE,OPTIONS\n" +
+		"HOST: http://localhost:8080\n"
+
+	c.String(200, secenekler)
 }

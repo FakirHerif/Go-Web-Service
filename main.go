@@ -39,7 +39,7 @@ func checkErr(err error) {
 
 func getPersons(c *gin.Context) {
 
-	persons, err := models.GetPersons(10)
+	persons, err := models.GetPersons(20)
 	checkErr(err)
 
 	if persons == nil {
@@ -52,7 +52,16 @@ func getPersons(c *gin.Context) {
 
 func getPersonById(c *gin.Context) {
 	id := c.Param("id")
-	c.JSON(http.StatusOK, gin.H{"msg": "ID'si " + id + " Olan Person Çağırıldı (GET)"})
+
+	person, err := models.GetPersonById(id)
+	checkErr(err)
+
+	if person.FirstName == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"Hata": "Kayıt bulunamadı"})
+		return
+	} else {
+		c.JSON(http.StatusOK, gin.H{"data": person})
+	}
 }
 
 func addPerson(c *gin.Context) {

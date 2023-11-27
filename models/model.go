@@ -58,3 +58,23 @@ func GetPersons(count int) ([]Person, error) {
 
 	return people, err
 }
+
+func GetPersonById(id string) (Person, error) {
+	stmt, err := DB.Prepare("SELECT id, first_name, last_name, email, ip_address FROM people WHERE id = ?")
+
+	if err != nil {
+		return Person{}, err
+	}
+
+	person := Person{}
+
+	sqlErr := stmt.QueryRow(id).Scan(&person.Id, &person.FirstName, &person.LastName, &person.Email, &person.IpAddress)
+
+	if sqlErr != nil {
+		if sqlErr == sql.ErrNoRows {
+			return Person{}, nil
+		}
+		return Person{}, sqlErr
+	}
+	return person, nil
+}

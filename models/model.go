@@ -128,3 +128,29 @@ func UpdatePerson(ourPerson Person, id int) (bool, error) {
 
 	return true, nil
 }
+
+func DeletePerson(personId int) (bool, error) {
+	tx, err := DB.Begin()
+
+	if err != nil {
+		return false, err
+	}
+
+	stmt, err := DB.Prepare("DELETE from people WHERE id = ?")
+
+	if err != nil {
+		return false, err
+	}
+
+	defer stmt.Close()
+
+	_, err = stmt.Exec(personId)
+
+	if err != nil {
+		return false, err
+	}
+
+	tx.Commit()
+
+	return true, nil
+}

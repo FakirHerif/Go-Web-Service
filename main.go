@@ -108,8 +108,20 @@ func updatePerson(c *gin.Context) {
 }
 
 func deletePerson(c *gin.Context) {
-	id := c.Param("id")
-	c.JSON(http.StatusOK, gin.H{"msg": "ID'si " + id + " Olan Person Silindi (DELETE)"})
+
+	personId, err := strconv.Atoi(c.Param("id"))
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"HATA": "GEÇERSİZ ID !"})
+	}
+
+	success, err := models.DeletePerson(personId)
+
+	if success {
+		c.JSON(http.StatusOK, gin.H{"MSG": "BAŞARILI !!! BİLGİLER SİLİNDİ"})
+	} else {
+		c.JSON(http.StatusBadRequest, gin.H{"HATA": err})
+	}
 }
 
 func options(c *gin.Context) {

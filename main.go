@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 
@@ -38,96 +39,144 @@ func checkErr(err error) {
 	}
 }
 
+func handleRequest(f func(*gin.Context), c *gin.Context, wg *sync.WaitGroup) {
+	defer wg.Done()
+	f(c)
+}
+
 func getPersons(c *gin.Context) {
 
-	persons, err := models.GetPersons(20)
-	checkErr(err)
+	var wg sync.WaitGroup
+	wg.Add(1)
 
-	if persons == nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Hata": "Kayıt bulunamadı"})
-		return
-	} else {
+	go handleRequest(func(c *gin.Context) {
+		persons, err := models.GetPersons(20)
+		checkErr(err)
+
+		if persons == nil {
+			c.JSON(http.StatusBadRequest, gin.H{"Hata": "Kayıt bulunamadı"})
+			return
+		}
+
 		c.JSON(http.StatusOK, gin.H{"data": persons})
-	}
+	}, c, &wg)
+
+	wg.Wait()
 }
 
 func getPersonById(c *gin.Context) {
-	id := c.Param("id")
 
-	person, err := models.GetPersonById(id)
-	checkErr(err)
+	var wg sync.WaitGroup
+	wg.Add(1)
 
-	if person.FirstName == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"Hata": "Kayıt bulunamadı"})
-		return
-	} else {
+	go handleRequest(func(c *gin.Context) {
+		id := c.Param("id")
+		person, err := models.GetPersonById(id)
+		checkErr(err)
+
+		if person.FirstName == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"Hata": "Kayıt bulunamadı"})
+			return
+		}
+
 		c.JSON(http.StatusOK, gin.H{"data": person})
-	}
+	}, c, &wg)
+
+	wg.Wait()
 }
 
 func addPerson(c *gin.Context) {
 
-	var json models.Person
+	var wg sync.WaitGroup
+	wg.Add(1)
 
-	if err := c.ShouldBindJSON(&json); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Hata": err.Error()})
-		return
-	}
+	go handleRequest(func(c *gin.Context) {
+		var json models.Person
 
-	success, err := models.AddPerson(json)
+		if err := c.ShouldBindJSON(&json); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"Hata": err.Error()})
+			return
+		}
 
-	if success {
-		c.JSON(http.StatusOK, gin.H{"MSG": "BAŞARILI !!! PERSON EKLENDİ"})
-	} else {
-		c.JSON(http.StatusBadRequest, gin.H{"HATA": err})
-	}
+		success, err := models.AddPerson(json)
+
+		if success {
+			c.JSON(http.StatusOK, gin.H{"MSG": "BAŞARILI !!! PERSON EKLENDİ"})
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"HATA": err})
+		}
+	}, c, &wg)
+
+	wg.Wait()
 }
 
 func updatePerson(c *gin.Context) {
 
-	var json models.Person
+	var wg sync.WaitGroup
+	wg.Add(1)
 
-	if err := c.ShouldBindJSON(&json); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"HATA": err.Error()})
-		return
-	}
+	go handleRequest(func(c *gin.Context) {
+		var json models.Person
 
-	personId, err := strconv.Atoi(c.Param("id"))
+		if err := c.ShouldBindJSON(&json); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"HATA": err.Error()})
+			return
+		}
 
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"HATA": "GEÇERSİZ ID !"})
-	}
+		personId, err := strconv.Atoi(c.Param("id"))
 
-	success, err := models.UpdatePerson(json, personId)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"HATA": "GEÇERSİZ ID !"})
+		}
 
-	if success {
-		c.JSON(http.StatusOK, gin.H{"MSG": "BAŞARILI !!! BİLGİLER DEĞİŞTİRİLDİ"})
-	} else {
-		c.JSON(http.StatusBadRequest, gin.H{"HATA": err})
-	}
+		success, err := models.UpdatePerson(json, personId)
+
+		if success {
+			c.JSON(http.StatusOK, gin.H{"MSG": "BAŞARILI !!! BİLGİLER DEĞİŞTİRİLDİ"})
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"HATA": err})
+		}
+	}, c, &wg)
+
+	wg.Wait()
 }
 
 func deletePerson(c *gin.Context) {
 
-	personId, err := strconv.Atoi(c.Param("id"))
+	var wg sync.WaitGroup
+	wg.Add(1)
 
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"HATA": "GEÇERSİZ ID !"})
-	}
+	go handleRequest(func(c *gin.Context) {
+		personId, err := strconv.Atoi(c.Param("id"))
 
-	success, err := models.DeletePerson(personId)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"HATA": "GEÇERSİZ ID !"})
+		}
 
-	if success {
-		c.JSON(http.StatusOK, gin.H{"MSG": "BAŞARILI !!! BİLGİLER SİLİNDİ"})
-	} else {
-		c.JSON(http.StatusBadRequest, gin.H{"HATA": err})
-	}
+		success, err := models.DeletePerson(personId)
+
+		if success {
+			c.JSON(http.StatusOK, gin.H{"MSG": "BAŞARILI !!! BİLGİLER SİLİNDİ"})
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"HATA": err})
+		}
+	}, c, &wg)
+
+	wg.Wait()
 }
 
 func options(c *gin.Context) {
-	secenekler := "200 OK\n" +
-		"METOTLAR: GET,POST,PUT,DELETE,OPTIONS\n" +
-		"HOST: http://localhost:8080\n"
 
-	c.String(200, secenekler)
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	go handleRequest(func(c *gin.Context) {
+		secenekler := "200 OK\n" +
+			"METOTLAR: GET,POST,PUT,DELETE,OPTIONS\n" +
+			"HOST: http://localhost:8080\n"
+
+		c.String(200, secenekler)
+	}, c, &wg)
+
+	wg.Wait()
 }

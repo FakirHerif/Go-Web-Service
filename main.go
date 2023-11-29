@@ -51,7 +51,10 @@ func getPersons(c *gin.Context) {
 
 	go handleRequest(func(c *gin.Context) {
 		persons, err := models.GetPersons(20)
-		checkErr(err)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"Hata": "Veritabanından kişiler alınamadı"})
+			return
+		}
 
 		if persons == nil {
 			c.JSON(http.StatusBadRequest, gin.H{"Hata": "Kayıt bulunamadı"})
@@ -72,7 +75,10 @@ func getPersonById(c *gin.Context) {
 	go handleRequest(func(c *gin.Context) {
 		id := c.Param("id")
 		person, err := models.GetPersonById(id)
-		checkErr(err)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"HATA": "Veritabanında kişi aranırken bir hata oluştu"})
+			return
+		}
 
 		if person.FirstName == "" {
 			c.JSON(http.StatusBadRequest, gin.H{"Hata": "Kayıt bulunamadı"})
@@ -98,12 +104,22 @@ func addPerson(c *gin.Context) {
 			return
 		}
 
+		if json.FirstName == "" || json.LastName == "" || json.Email == "" || json.IpAddress == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"Hata": "Geçersiz giriş verisi"})
+			return
+		}
+
 		success, err := models.AddPerson(json)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"Hata": "Kişi eklenirken bir hata oluştu"})
+			return
+		}
 
 		if success {
 			c.JSON(http.StatusOK, gin.H{"MSG": "BAŞARILI !!! PERSON EKLENDİ"})
 		} else {
-			c.JSON(http.StatusBadRequest, gin.H{"HATA": err})
+			c.JSON(http.StatusBadRequest, gin.H{"HATA": "Kişi eklenemedi"})
 		}
 	}, c, &wg)
 
@@ -131,10 +147,15 @@ func updatePerson(c *gin.Context) {
 
 		success, err := models.UpdatePerson(json, personId)
 
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"Hata": "Kişi güncellenirken bir hata oluştu"})
+			return
+		}
+
 		if success {
 			c.JSON(http.StatusOK, gin.H{"MSG": "BAŞARILI !!! BİLGİLER DEĞİŞTİRİLDİ"})
 		} else {
-			c.JSON(http.StatusBadRequest, gin.H{"HATA": err})
+			c.JSON(http.StatusBadRequest, gin.H{"HATA": "Kişi bilgileri güncellenemedi"})
 		}
 	}, c, &wg)
 
@@ -155,10 +176,15 @@ func deletePerson(c *gin.Context) {
 
 		success, err := models.DeletePerson(personId)
 
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"Hata": "Kişi silinirken bir hata oluştu"})
+			return
+		}
+
 		if success {
 			c.JSON(http.StatusOK, gin.H{"MSG": "BAŞARILI !!! BİLGİLER SİLİNDİ"})
 		} else {
-			c.JSON(http.StatusBadRequest, gin.H{"HATA": err})
+			c.JSON(http.StatusBadRequest, gin.H{"HATA": "Bilgiler silinemedi"})
 		}
 	}, c, &wg)
 

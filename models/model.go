@@ -110,6 +110,18 @@ func UpdatePerson(ourPerson Person, id int) (bool, error) {
 		return false, err
 	}
 
+	var count int
+	err = DB.QueryRow("SELECT COUNT(*) FROM people WHERE id = ?", id).Scan(&count)
+	if err != nil {
+		tx.Rollback()
+		return false, err
+	}
+
+	if count == 0 {
+		tx.Rollback()
+		return false, err
+	}
+
 	stmt, err := tx.Prepare("UPDATE people SET first_name = ?, last_name = ?, email = ?, ip_address = ? WHERE Id = ?")
 
 	if err != nil {
@@ -133,6 +145,17 @@ func DeletePerson(personId int) (bool, error) {
 	tx, err := DB.Begin()
 
 	if err != nil {
+		return false, err
+	}
+
+	var count int
+	err = DB.QueryRow("SELECT COUNT(*) FROM people WHERE id = ?", personId).Scan(&count)
+	if err != nil {
+		return false, err
+	}
+
+	if count == 0 {
+		tx.Rollback()
 		return false, err
 	}
 

@@ -20,13 +20,20 @@ func ConnectDatabase() error {
 }
 
 type Person struct {
-	Id        int    `json:"id"`
+	Id        int    `json:"id" swaggerignore:"true"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
 	Email     string `json:"email"`
 	IpAddress string `json:"ip_address"`
 }
 
+// @Summary Get a list of 20 persons
+// @Description Get persons list from the database
+// @Tags persons
+// @Accept json
+// @Produce json
+// @Success 200 {object} Person
+// @Router /api/v1/person [get]
 func GetPersons(count int) ([]Person, error) {
 
 	rows, err := DB.Query("SELECT id, first_name, last_name, email, ip_address from people LIMIT " + strconv.Itoa(count))
@@ -59,6 +66,14 @@ func GetPersons(count int) ([]Person, error) {
 	return people, err
 }
 
+// @Summary Get a person by ID
+// @Description Get a person by their ID from the database
+// @Tags persons
+// @Accept json
+// @Produce json
+// @Param id path int true "Person ID"
+// @Success 200 {object} Person
+// @Router /api/v1/person/{id} [get]
 func GetPersonById(id string) (Person, error) {
 	stmt, err := DB.Prepare("SELECT id, first_name, last_name, email, ip_address FROM people WHERE id = ?")
 
@@ -79,6 +94,14 @@ func GetPersonById(id string) (Person, error) {
 	return person, nil
 }
 
+// @Summary Add a new person
+// @Description Add a new person to the database
+// @Tags persons
+// @Accept json
+// @Produce json
+// @Param person body Person true "New Person Object"
+// @Success 200 {string} string "Person added successfully"
+// @Router /api/v1/person [post]
 func AddPerson(newPerson Person) (bool, error) {
 	tx, err := DB.Begin()
 	if err != nil {
@@ -104,6 +127,15 @@ func AddPerson(newPerson Person) (bool, error) {
 	return true, nil
 }
 
+// @Summary Update a person's information by their ID
+// @Description Update a person's information in the database by their ID
+// @Tags persons
+// @Accept json
+// @Produce json
+// @Param id path int true "Person ID"
+// @Param person body Person true "Updated Person Object"
+// @Success 200 {string} string "Person updated successfully"
+// @Router /api/v1/person/{id} [put]
 func UpdatePerson(ourPerson Person, id int) (bool, error) {
 	tx, err := DB.Begin()
 	if err != nil {
@@ -141,6 +173,14 @@ func UpdatePerson(ourPerson Person, id int) (bool, error) {
 	return true, nil
 }
 
+// @Summary Delete a person by their ID
+// @Description Delete a person from the database by their ID
+// @Tags persons
+// @Accept json
+// @Produce json
+// @Param id path int true "Person ID"
+// @Success 200 {string} string "Person deleted successfully"
+// @Router /api/v1/person/{id} [delete]
 func DeletePerson(personId int) (bool, error) {
 	tx, err := DB.Begin()
 

@@ -1,0 +1,139 @@
+basePath: /
+definitions:
+  models.Person:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      ip_address:
+        type: string
+      last_name:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: alibasdemir@gmail.com
+    name: Ali
+    url: https://github.com/FakirHerif/Go-Web-Service
+  description: This is a sample CRUD API for managing persons.
+  title: Web Service API
+  version: "1.0"
+paths:
+  /api/v1/person:
+    get:
+      consumes:
+      - application/json
+      description: Get persons list from the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Person'
+      summary: Get a list of 20 persons
+      tags:
+      - persons
+    options:
+      description: Get available options for the API
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Available options for the API
+          schema:
+            type: string
+      summary: Get available options
+      tags:
+      - persons
+    post:
+      consumes:
+      - application/json
+      description: Add a new person to the database
+      parameters:
+      - description: New Person Object
+        in: body
+        name: person
+        required: true
+        schema:
+          $ref: '#/definitions/models.Person'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Person added successfully
+          schema:
+            type: string
+      summary: Add a new person
+      tags:
+      - persons
+  /api/v1/person/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a person from the database by their ID
+      parameters:
+      - description: Person ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Person deleted successfully
+          schema:
+            type: string
+      summary: Delete a person by their ID
+      tags:
+      - persons
+    get:
+      consumes:
+      - application/json
+      description: Get a person by their ID from the database
+      parameters:
+      - description: Person ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Person'
+      summary: Get a person by ID
+      tags:
+      - persons
+    put:
+      consumes:
+      - application/json
+      description: Update a person's information in the database by their ID
+      parameters:
+      - description: Person ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated Person Object
+        in: body
+        name: person
+        required: true
+        schema:
+          $ref: '#/definitions/models.Person'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Person updated successfully
+          schema:
+            type: string
+      summary: Update a person's information by their ID
+      tags:
+      - persons
+swagger: "2.0"

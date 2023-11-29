@@ -9,11 +9,26 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"example.com/webservice/models"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
+	_ "example.com/webservice/docs"
 )
 
+// @title Web Service API
+// @version 1.0
+// @description This is a sample CRUD API for managing persons.
+// @host localhost:8080
+// @BasePath /
+// @contact.name   Ali
+// @contact.url    https://github.com/FakirHerif/Go-Web-Service
+// @contact.email  alibasdemir@gmail.com
 func main() {
 
 	r := gin.Default()
+
+	r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	v1 := r.Group("/api/v1")
 
@@ -191,6 +206,12 @@ func deletePerson(c *gin.Context) {
 	wg.Wait()
 }
 
+// @Summary Get available options
+// @Description Get available options for the API
+// @Tags persons
+// @Produce plain
+// @Success 200 {string} string "Available options for the API"
+// @Router /api/v1/person [options]
 func options(c *gin.Context) {
 
 	var wg sync.WaitGroup

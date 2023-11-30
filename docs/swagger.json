@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "This is a sample CRUD API for managing persons.",
+        "description": "This is a sample CRUD API for managing persons. Uses Prometheus for monitoring HTTP request durations and CRUD operations.",
         "title": "Web Service API",
         "contact": {
             "name": "Ali",

@@ -17,7 +17,8 @@ info:
     email: alibasdemir@gmail.com
     name: Ali
     url: https://github.com/FakirHerif/Go-Web-Service
-  description: This is a sample CRUD API for managing persons.
+  description: This is a sample CRUD API for managing persons. Uses Prometheus for
+    monitoring HTTP request durations and CRUD operations.
   title: Web Service API
   version: "1.0"
 paths:

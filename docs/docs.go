@@ -222,7 +222,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Web Service API",
-	Description:      "This is a sample CRUD API for managing persons.",
+	Description:      "This is a sample CRUD API for managing persons. Uses Prometheus for monitoring HTTP request durations and CRUD operations.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

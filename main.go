@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
 	"strconv"
@@ -73,6 +74,11 @@ func main() {
 		v1.PUT("person/:id", updatePerson)
 		v1.DELETE("person/:id", deletePerson)
 		v1.OPTIONS("person", options)
+		v1.GET("/user", getUsers)
+		v1.GET("/user/:id", getUserByID)
+		v1.POST("/user", addUser)
+		v1.PUT("/user/:id", updateUser)
+		v1.DELETE("/user/:id", deleteUser)
 	}
 
 	err := models.ConnectDatabase()
@@ -316,4 +322,173 @@ func options(c *gin.Context) {
 	}, c, &wg)
 
 	wg.Wait()
+}
+
+func getUsers(c *gin.Context) {
+	start := time.Now()
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	go handleRequest(func(c *gin.Context) {
+		users, err := models.GetUsers()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"Hata": "Kullanıcılar alınamadı"})
+			crudOperations.WithLabelValues("GET", "error").Inc()
+			return
+		}
+
+		if len(users) == 0 {
+			c.JSON(http.StatusBadRequest, gin.H{"Hata": "Kayıt bulunamadı"})
+			crudOperations.WithLabelValues("GET", "not_found").Inc()
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"data": users})
+		crudOperations.WithLabelValues("GET", "success").Inc()
+	}, c, &wg)
+
+	wg.Wait()
+
+	duration := time.Since(start).Seconds()
+	requestDuration.WithLabelValues("/api/v1/user", "GET").Observe(duration)
+}
+
+func getUserByID(c *gin.Context) {
+	start := time.Now()
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	go handleRequest(func(c *gin.Context) {
+		userIDString := c.Param("id")
+		userID, err := strconv.Atoi(userIDString)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Geçersiz Kullanıcı ID'si"})
+			return
+		}
+
+		user, err := models.GetUserByID(userID)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				c.JSON(http.StatusNotFound, gin.H{"error": "Kullanıcı Bulunamadı"})
+				return
+			}
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Kullanıcı çağırılırken hata oluştu"})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"data": user})
+	}, c, &wg)
+
+	wg.Wait()
+
+	duration := time.Since(start).Seconds()
+	requestDuration.WithLabelValues("/api/v1/user/:id", "GET").Observe(duration)
+}
+
+func addUser(c *gin.Context) {
+	start := time.Now()
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	go handleRequest(func(c *gin.Context) {
+		var user models.User
+
+		if err := c.ShouldBindJSON(&user); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"Hata": err.Error()})
+			crudOperations.WithLabelValues("addUser", "bad_request").Inc()
+			return
+		}
+
+		id, err := models.CreateUser(user)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"Hata": "Kullanıcı eklenemedi"})
+			crudOperations.WithLabelValues("addUser", "error").Inc()
+			return
+		}
+
+		if id != 0 {
+			c.JSON(http.StatusOK, gin.H{"message": "Kullanıcı başarıyla eklendi", "id": id})
+			crudOperations.WithLabelValues("addUser", "success").Inc()
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"Hata": "Kullanıcı eklenemedi"})
+			crudOperations.WithLabelValues("addUser", "failed").Inc()
+		}
+	}, c, &wg)
+
+	wg.Wait()
+
+	duration := time.Since(start).Seconds()
+	requestDuration.WithLabelValues("/api/v1/user", "POST").Observe(duration)
+}
+
+func updateUser(c *gin.Context) {
+	start := time.Now()
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	go handleRequest(func(c *gin.Context) {
+		userIDStr := c.Param("id")
+
+		userID, err := strconv.Atoi(userIDStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Geçersiz Kullanıcı ID'si"})
+			crudOperations.WithLabelValues("updateUser", "bad_request").Inc()
+			return
+		}
+
+		var user models.User
+		if err := c.ShouldBindJSON(&user); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			crudOperations.WithLabelValues("updateUser", "bad_request").Inc()
+			return
+		}
+
+		user.ID = userID
+
+		err = models.UpdateUser(user)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Kullanıcı güncellenemedi"})
+			crudOperations.WithLabelValues("updateUser", "error").Inc()
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "Kullanıcı başarıyla güncellendi"})
+		crudOperations.WithLabelValues("updateUser", "success").Inc()
+	}, c, &wg)
+
+	wg.Wait()
+
+	duration := time.Since(start).Seconds()
+	requestDuration.WithLabelValues("/api/v1/user/:id", "PUT").Observe(duration)
+}
+
+func deleteUser(c *gin.Context) {
+	start := time.Now()
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	go handleRequest(func(c *gin.Context) {
+		userID := c.Param("id")
+		id, _ := strconv.Atoi(userID)
+
+		err := models.DeleteUser(id)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"Hata": "Kullanıcı silinemedi"})
+			crudOperations.WithLabelValues("deleteUser", "error").Inc()
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "Kullanıcı başarıyla silindi"})
+		crudOperations.WithLabelValues("deleteUser", "success").Inc()
+	}, c, &wg)
+
+	wg.Wait()
+
+	duration := time.Since(start).Seconds()
+	requestDuration.WithLabelValues("/api/v1/user/:id", "DELETE").Observe(duration)
 }

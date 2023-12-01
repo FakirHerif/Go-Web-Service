@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"strconv"
 
+	"errors"
+
 	_ "modernc.org/sqlite"
 )
 
@@ -27,9 +29,16 @@ type Person struct {
 	IpAddress string `json:"ip_address"`
 }
 
+type User struct {
+	ID       int    `json:"id"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 // @Summary Get a list of 20 persons
 // @Description Get persons list from the database
-// @Tags persons
+// @Tags person
 // @Accept json
 // @Produce json
 // @Success 200 {object} Person
@@ -68,7 +77,7 @@ func GetPersons(count int) ([]Person, error) {
 
 // @Summary Get a person by ID
 // @Description Get a person by their ID from the database
-// @Tags persons
+// @Tags person
 // @Accept json
 // @Produce json
 // @Param id path int true "Person ID"
@@ -96,7 +105,7 @@ func GetPersonById(id string) (Person, error) {
 
 // @Summary Add a new person
 // @Description Add a new person to the database
-// @Tags persons
+// @Tags person
 // @Accept json
 // @Produce json
 // @Param person body Person true "New Person Object"
@@ -129,7 +138,7 @@ func AddPerson(newPerson Person) (bool, error) {
 
 // @Summary Update a person's information by their ID
 // @Description Update a person's information in the database by their ID
-// @Tags persons
+// @Tags person
 // @Accept json
 // @Produce json
 // @Param id path int true "Person ID"
@@ -175,7 +184,7 @@ func UpdatePerson(ourPerson Person, id int) (bool, error) {
 
 // @Summary Delete a person by their ID
 // @Description Delete a person from the database by their ID
-// @Tags persons
+// @Tags person
 // @Accept json
 // @Produce json
 // @Param id path int true "Person ID"
@@ -216,4 +225,146 @@ func DeletePerson(personId int) (bool, error) {
 	tx.Commit()
 
 	return true, nil
+}
+
+// @Summary Get a list of users
+// @Description Get users list from the database
+// @Tags user
+// @Accept json
+// @Produce json
+// @Success 200 {object} User
+// @Router /api/v1/user [get]
+func GetUsers() ([]User, error) {
+	rows, err := DB.Query("SELECT id, username, email, password FROM user")
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	users := make([]User, 0)
+
+	for rows.Next() {
+		var user User
+		err := rows.Scan(&user.ID, &user.Username, &user.Email, &user.Password)
+
+		if err != nil {
+			return nil, err
+		}
+
+		users = append(users, user)
+	}
+
+	err = rows.Err()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return users, nil
+}
+
+// @Summary Get a user by ID
+// @Description Get a user by their ID from the database
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param id path int true "User ID"
+// @Success 200 {object} User
+// @Router /api/v1/user/{id} [get]
+func GetUserByID(userID int) (User, error) {
+	var user User
+	err := DB.QueryRow("SELECT id, username, email, password FROM user WHERE id = ?", userID).Scan(&user.ID, &user.Username, &user.Email, &user.Password)
+	if err != nil {
+		return User{}, err
+	}
+	return user, nil
+}
+
+// @Summary Create a new user
+// @Description Create a new user in the database
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param newUser body User true "New user details"
+// @Success 200 {integer} integer
+// @Router /api/v1/user [post]
+func CreateUser(newUser User) (int64, error) {
+	result, err := DB.Exec("INSERT INTO user (username, email, password) VALUES (?, ?, ?)", newUser.Username, newUser.Email, newUser.Password)
+	if err != nil {
+		return 0, err
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
+}
+
+// @Summary Update an existing user
+// @Description Update an existing user in the database
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param id path int true "User ID to update"
+// @Param updatedUser body User true "Updated user details"
+// @Success 200 {string} string
+// @Router /api/v1/user/{id} [put]
+func UpdateUser(updatedUser User) error {
+	var count int
+	err := DB.QueryRow("SELECT COUNT(*) FROM user WHERE id = ?", updatedUser.ID).Scan(&count)
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return errors.New("kullanici bulunamadi")
+	}
+
+	query := "UPDATE user SET username = ?, email = ?"
+	var args []interface{}
+	args = append(args, updatedUser.Username, updatedUser.Email)
+
+	if updatedUser.Password != "" {
+		query += ", password = ?"
+		args = append(args, updatedUser.Password)
+	}
+
+	query += " WHERE id = ?"
+	args = append(args, updatedUser.ID)
+
+	_, err = DB.Exec(query, args...)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// @Summary Delete a user by ID
+// @Description Delete a user from the database by their ID
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param id path int true "User ID to delete"
+// @Success 200 {string} string
+// @Router /api/v1/user/{id} [delete]
+func DeleteUser(userID int) error {
+	result, err := DB.Exec("DELETE FROM user WHERE id = ?", userID)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return errors.New("kullanici bulunamadi")
+	}
+
+	return nil
 }

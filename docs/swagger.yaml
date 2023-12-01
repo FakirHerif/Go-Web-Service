@@ -11,6 +11,17 @@ definitions:
       last_name:
         type: string
     type: object
+  models.User:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      password:
+        type: string
+      username:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -36,7 +47,7 @@ paths:
             $ref: '#/definitions/models.Person'
       summary: Get a list of 20 persons
       tags:
-      - persons
+      - person
     options:
       description: Get available options for the API
       produces:
@@ -69,7 +80,7 @@ paths:
             type: string
       summary: Add a new person
       tags:
-      - persons
+      - person
   /api/v1/person/{id}:
     delete:
       consumes:
@@ -90,7 +101,7 @@ paths:
             type: string
       summary: Delete a person by their ID
       tags:
-      - persons
+      - person
     get:
       consumes:
       - application/json
@@ -110,7 +121,7 @@ paths:
             $ref: '#/definitions/models.Person'
       summary: Get a person by ID
       tags:
-      - persons
+      - person
     put:
       consumes:
       - application/json
@@ -136,5 +147,108 @@ paths:
             type: string
       summary: Update a person's information by their ID
       tags:
-      - persons
+      - person
+  /api/v1/user:
+    get:
+      consumes:
+      - application/json
+      description: Get users list from the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+      summary: Get a list of users
+      tags:
+      - user
+    post:
+      consumes:
+      - application/json
+      description: Create a new user in the database
+      parameters:
+      - description: New user details
+        in: body
+        name: newUser
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      summary: Create a new user
+      tags:
+      - user
+  /api/v1/user/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a user from the database by their ID
+      parameters:
+      - description: User ID to delete
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Delete a user by ID
+      tags:
+      - user
+    get:
+      consumes:
+      - application/json
+      description: Get a user by their ID from the database
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+      summary: Get a user by ID
+      tags:
+      - user
+    put:
+      consumes:
+      - application/json
+      description: Update an existing user in the database
+      parameters:
+      - description: User ID to update
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated user details
+        in: body
+        name: updatedUser
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Update an existing user
+      tags:
+      - user
 swagger: "2.0"

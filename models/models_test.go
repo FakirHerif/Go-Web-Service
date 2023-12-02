@@ -110,3 +110,105 @@ func TestCRUDOperations(t *testing.T) {
 
 	t.Logf("Tekrarlanan getPersons testinde alınan kişiler: %+v", persons)
 }
+
+type MockUserDB struct {
+	TestUsers []models.User
+}
+
+func (m *MockUserDB) GetUsers() ([]models.User, error) {
+	return m.TestUsers, nil
+}
+
+func (m *MockUserDB) AddUser(user models.User) error {
+	m.TestUsers = append(m.TestUsers, user)
+	return nil
+}
+
+func (m *MockUserDB) UpdateUser(user models.User) error {
+	for i, u := range m.TestUsers {
+		if u.ID == user.ID {
+			m.TestUsers[i] = user
+			return nil
+		}
+	}
+	return errors.New("Kullanıcı bulunamadı")
+}
+
+func (m *MockUserDB) DeleteUser(id int) error {
+	for i, u := range m.TestUsers {
+		if u.ID == id {
+			m.TestUsers = append(m.TestUsers[:i], m.TestUsers[i+1:]...)
+			return nil
+		}
+	}
+	return errors.New("Kullanıcı bulunamadı")
+}
+
+func TestCRUDOperationsForUser(t *testing.T) {
+	mockDB := &MockUserDB{}
+
+	// AddUser testi
+	newUser := models.User{ID: 1, Username: "testuser", Email: "testuser@example.com", Password: "test1234"}
+	err := mockDB.AddUser(newUser)
+	if err != nil {
+		t.Errorf("Kullanıcı eklenirken hata oluştu: %v", err)
+	}
+
+	t.Logf("Kullanıcı eklendi: %+v", newUser)
+
+	// GetUsers testi
+	users, err := mockDB.GetUsers()
+	if err != nil {
+		t.Errorf("Kullanıcılar alınırken hata oluştu: %v", err)
+	}
+
+	expectedCount := 1 // Beklenen kullanıcı sayısı
+	if len(users) != expectedCount {
+		t.Errorf("Beklenen kullanıcı sayısı alınmadı. Beklenen: %d, Alınan: %d", expectedCount, len(users))
+	}
+
+	t.Logf("Alınan kullanıcılar: %+v", users)
+
+	// UpdateUser testi
+	updateUser := models.User{ID: 1, Username: "testuserGÜNCELLENDİ", Email: "testuserGÜNCELLENDİ@example.com", Password: "test1234GÜNCELLENDİ"}
+	err = mockDB.UpdateUser(updateUser)
+	if err != nil {
+		t.Errorf("Kullanıcı güncellenirken hata oluştu: %v", err)
+	}
+
+	t.Logf("Kullanıcı güncellendi: %+v", updateUser)
+
+	// GetUsers Güncelleme sonrası ikinci test
+	users, err = mockDB.GetUsers()
+	if err != nil {
+		t.Errorf("Kullanıcılar alınırken hata oluştu: %v", err)
+	}
+
+	expectedCount = 1 // Beklenen kullanıcı sayısı
+	if len(users) != expectedCount {
+		t.Errorf("Beklenen kullanıcı sayısı alınmadı. Beklenen: %d, Alınan: %d", expectedCount, len(users))
+	}
+
+	t.Logf("Güncellemeden Sonra Alınan kullanıcılar: %+v", users)
+
+	// DeleteUser testi
+	err = mockDB.DeleteUser(1)
+	if err != nil {
+		t.Errorf("Kullanıcı silinirken hata oluştu: %v", err)
+	}
+
+	t.Logf("Kullanıcı silindi: ID=%d", 1)
+
+	// Tekrar GetUsers testi
+	users, err = mockDB.GetUsers()
+	if err != nil {
+		t.Errorf("Kullanıcılar alınırken hata oluştu: %v", err)
+	}
+
+	expectedCount = 0 // Beklenen kullanıcı sayısı 0 (silindiği için)
+	if len(users) != expectedCount {
+		t.Errorf("Beklenen kullanıcı sayısı alınmadı. Beklenen: %d, Alınan: %d", expectedCount, len(users))
+	}
+
+	t.Logf("Tekrarlanan GetUsers testinde alınan kullanıcılar: %+v", users)
+}

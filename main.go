@@ -19,6 +19,8 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+
+	"example.com/webservice/auth"
 )
 
 var (
@@ -64,6 +66,9 @@ func main() {
 	r.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
+
+	r.POST("/login", auth.Login)
+	r.GET("/secured", auth.TokenAuthMiddleware(), auth.SecuredEndpoint) // TOKEN ÖRNEĞİ: İSTENİLEN ENDPOINT İÇİN auth.TokenAuthMiddleware() KULLANILIR ÖRNEK: v1.GET("person", auth.TokenAuthMiddleware(), getPersons)
 
 	v1 := r.Group("/api/v1")
 

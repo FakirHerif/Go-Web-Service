@@ -131,14 +131,12 @@ func getPersons(c *gin.Context) {
 }
 
 func getPersonById(c *gin.Context) {
+	start := time.Now()
 
 	var wg sync.WaitGroup
 	wg.Add(1)
 
 	go handleRequest(func(c *gin.Context) {
-
-		start := time.Now()
-
 		id := c.Param("id")
 		person, err := models.GetPersonById(id)
 		if err != nil {
@@ -155,23 +153,21 @@ func getPersonById(c *gin.Context) {
 
 		c.JSON(http.StatusOK, gin.H{"data": person})
 		crudOperations.WithLabelValues("getPersonById", "success").Inc()
-
-		duration := time.Since(start).Seconds()
-		requestDuration.WithLabelValues("/api/v1/person/:id", "GET").Observe(duration)
 	}, c, &wg)
 
 	wg.Wait()
+
+	duration := time.Since(start).Seconds()
+	requestDuration.WithLabelValues("/api/v1/person/:id", "GET").Observe(duration)
 }
 
 func addPerson(c *gin.Context) {
+	start := time.Now()
 
 	var wg sync.WaitGroup
 	wg.Add(1)
 
 	go handleRequest(func(c *gin.Context) {
-
-		start := time.Now()
-
 		var json models.Person
 
 		if err := c.ShouldBindJSON(&json); err != nil {
@@ -201,23 +197,21 @@ func addPerson(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"HATA": "Kişi eklenemedi"})
 			crudOperations.WithLabelValues("addPerson", "failed").Inc()
 		}
-
-		duration := time.Since(start).Seconds()
-		requestDuration.WithLabelValues("/api/v1/person", "POST").Observe(duration)
 	}, c, &wg)
 
 	wg.Wait()
+
+	duration := time.Since(start).Seconds()
+	requestDuration.WithLabelValues("/api/v1/person", "POST").Observe(duration)
 }
 
 func updatePerson(c *gin.Context) {
+	start := time.Now()
 
 	var wg sync.WaitGroup
 	wg.Add(1)
 
 	go handleRequest(func(c *gin.Context) {
-
-		start := time.Now()
-
 		var json models.Person
 
 		if err := c.ShouldBindJSON(&json); err != nil {
@@ -248,23 +242,21 @@ func updatePerson(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"HATA": "Kişi bilgileri güncellenemedi"})
 			crudOperations.WithLabelValues("updatePerson", "failed").Inc()
 		}
-
-		duration := time.Since(start).Seconds()
-		requestDuration.WithLabelValues("/api/v1/person/:id", "PUT").Observe(duration)
 	}, c, &wg)
 
 	wg.Wait()
+
+	duration := time.Since(start).Seconds()
+	requestDuration.WithLabelValues("/api/v1/person/:id", "PUT").Observe(duration)
 }
 
 func deletePerson(c *gin.Context) {
+	start := time.Now()
 
 	var wg sync.WaitGroup
 	wg.Add(1)
 
 	go handleRequest(func(c *gin.Context) {
-
-		start := time.Now()
-
 		personId, err := strconv.Atoi(c.Param("id"))
 
 		if err != nil {
@@ -287,12 +279,12 @@ func deletePerson(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"HATA": "Bilgiler silinemedi"})
 			crudOperations.WithLabelValues("deletePerson", "failed").Inc()
 		}
-
-		duration := time.Since(start).Seconds()
-		requestDuration.WithLabelValues("/api/v1/person/:id", "DELETE").Observe(duration)
 	}, c, &wg)
 
 	wg.Wait()
+
+	duration := time.Since(start).Seconds()
+	requestDuration.WithLabelValues("/api/v1/person/:id", "DELETE").Observe(duration)
 }
 
 // @Summary Get available options
@@ -302,13 +294,12 @@ func deletePerson(c *gin.Context) {
 // @Success 200 {string} string "Available options for the API"
 // @Router /api/v1/person [options]
 func options(c *gin.Context) {
+	start := time.Now()
 
 	var wg sync.WaitGroup
 	wg.Add(1)
 
 	go handleRequest(func(c *gin.Context) {
-
-		start := time.Now()
 
 		secenekler := "200 OK\n" +
 			"METOTLAR: GET,POST,PUT,DELETE,OPTIONS\n" +
@@ -316,12 +307,12 @@ func options(c *gin.Context) {
 
 		c.String(200, secenekler)
 		crudOperations.WithLabelValues("options", "success").Inc()
-
-		duration := time.Since(start).Seconds()
-		requestDuration.WithLabelValues("/api/v1/person", "OPTIONS").Observe(duration)
 	}, c, &wg)
 
 	wg.Wait()
+
+	duration := time.Since(start).Seconds()
+	requestDuration.WithLabelValues("/api/v1/person", "OPTIONS").Observe(duration)
 }
 
 func getUsers(c *gin.Context) {

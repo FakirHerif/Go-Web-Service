@@ -34,6 +34,7 @@ type User struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
+	Role     string `json:"role"`
 }
 
 // @Summary Get a list of 20 persons
@@ -235,7 +236,7 @@ func DeletePerson(personId int) (bool, error) {
 // @Success 200 {object} User
 // @Router /api/v1/user [get]
 func GetUsers() ([]User, error) {
-	rows, err := DB.Query("SELECT id, username, email, password FROM user")
+	rows, err := DB.Query("SELECT id, username, email, password, role FROM user")
 
 	if err != nil {
 		return nil, err
@@ -247,7 +248,7 @@ func GetUsers() ([]User, error) {
 
 	for rows.Next() {
 		var user User
-		err := rows.Scan(&user.ID, &user.Username, &user.Email, &user.Password)
+		err := rows.Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Role)
 
 		if err != nil {
 			return nil, err
@@ -275,7 +276,7 @@ func GetUsers() ([]User, error) {
 // @Router /api/v1/user/{id} [get]
 func GetUserByID(userID int) (User, error) {
 	var user User
-	err := DB.QueryRow("SELECT id, username, email, password FROM user WHERE id = ?", userID).Scan(&user.ID, &user.Username, &user.Email, &user.Password)
+	err := DB.QueryRow("SELECT id, username, email, password, role FROM user WHERE id = ?", userID).Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Role)
 	if err != nil {
 		return User{}, err
 	}
@@ -291,7 +292,11 @@ func GetUserByID(userID int) (User, error) {
 // @Success 200 {integer} integer
 // @Router /api/v1/user [post]
 func CreateUser(newUser User) (int64, error) {
-	result, err := DB.Exec("INSERT INTO user (username, email, password) VALUES (?, ?, ?)", newUser.Username, newUser.Email, newUser.Password)
+	if newUser.Role == "" {
+		newUser.Role = "user"
+	}
+
+	result, err := DB.Exec("INSERT INTO user (username, email, password, role) VALUES (?, ?, ?, ?)", newUser.Username, newUser.Email, newUser.Password, newUser.Role)
 	if err != nil {
 		return 0, err
 	}
@@ -323,9 +328,9 @@ func UpdateUser(updatedUser User) error {
 		return errors.New("kullanici bulunamadi")
 	}
 
-	query := "UPDATE user SET username = ?, email = ?"
+	query := "UPDATE user SET username = ?, email = ?, role = ?"
 	var args []interface{}
-	args = append(args, updatedUser.Username, updatedUser.Email)
+	args = append(args, updatedUser.Username, updatedUser.Email, updatedUser.Role)
 
 	if updatedUser.Password != "" {
 		query += ", password = ?"

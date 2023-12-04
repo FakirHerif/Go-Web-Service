@@ -76,7 +76,7 @@ func TokenAuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		tokenString := authHeader[len("Token "):]
+		tokenString := authHeader[len("Bearer "):]
 
 		claims := &Claims{}
 

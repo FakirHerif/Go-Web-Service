@@ -231,11 +231,13 @@ func DeletePerson(personId int) (bool, error) {
 	return true, nil
 }
 
-// @Summary Get a list of users
+// @Summary Get a list of users with pagination
 // @Description Get users list from the database
 // @Tags user
 // @Accept json
 // @Produce json
+// @Param page query int false "Page number for pagination (default is 1)"
+// @Param pageSize query int false "Number of items per page (default is 20)"
 // @Success 200 {object} User
 // @Router /api/v1/user [get]
 func GetUsers(limit, offset int) ([]User, error) {

@@ -164,6 +164,15 @@ paths:
       consumes:
       - application/json
       description: Get users list from the database
+      parameters:
+      - description: Page number for pagination (default is 1)
+        in: query
+        name: page
+        type: integer
+      - description: Number of items per page (default is 20)
+        in: query
+        name: pageSize
+        type: integer
       produces:
       - application/json
       responses:
@@ -171,7 +180,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.User'
-      summary: Get a list of users
+      summary: Get a list of users with pagination
       tags:
       - user
     post:

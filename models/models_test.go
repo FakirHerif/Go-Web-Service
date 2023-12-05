@@ -148,7 +148,7 @@ func TestCRUDOperationsForUser(t *testing.T) {
 	mockDB := &MockUserDB{}
 
 	// AddUser testi
-	newUser := models.User{ID: 1, Username: "testuser", Email: "testuser@example.com", Password: "test1234"}
+	newUser := models.User{ID: 1, Username: "testuser", Email: "testuser@example.com", Password: "test1234", Role: "user"}
 	err := mockDB.AddUser(newUser)
 	if err != nil {
 		t.Errorf("Kullanıcı eklenirken hata oluştu: %v", err)
@@ -170,7 +170,7 @@ func TestCRUDOperationsForUser(t *testing.T) {
 	t.Logf("Alınan kullanıcılar: %+v", users)
 
 	// UpdateUser testi
-	updateUser := models.User{ID: 1, Username: "testuserGÜNCELLENDİ", Email: "testuserGÜNCELLENDİ@example.com", Password: "test1234GÜNCELLENDİ"}
+	updateUser := models.User{ID: 1, Username: "testuserGÜNCELLENDİ", Email: "testuserGÜNCELLENDİ@example.com", Password: "test1234GÜNCELLENDİ", Role: "admin"}
 	err = mockDB.UpdateUser(updateUser)
 	if err != nil {
 		t.Errorf("Kullanıcı güncellenirken hata oluştu: %v", err)

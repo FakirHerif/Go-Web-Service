@@ -242,7 +242,7 @@ func DeletePerson(personId int) (bool, error) {
 // @Router /api/v1/user [get]
 func GetUsers(limit, offset int) ([]User, error) {
 
-	query := fmt.Sprintf("SELECT id, username, email, password, role FROM user LIMIT %d OFFSET %d", limit, offset)
+	query := fmt.Sprintf("SELECT id, username, email, '*****' AS password, role FROM user LIMIT %d OFFSET %d", limit, offset)
 
 	rows, err := DB.Query(query)
 	if err != nil {
@@ -283,7 +283,7 @@ func GetUsers(limit, offset int) ([]User, error) {
 // @Router /api/v1/user/{id} [get]
 func GetUserByID(userID int) (User, error) {
 	var user User
-	err := DB.QueryRow("SELECT id, username, email, password, role FROM user WHERE id = ?", userID).Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Role)
+	err := DB.QueryRow("SELECT id, username, email, '*****' AS password, role FROM user WHERE id = ?", userID).Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Role)
 	if err != nil {
 		return User{}, err
 	}

@@ -19,6 +19,8 @@ definitions:
         type: integer
       password:
         type: string
+      role:
+        type: string
       username:
         type: string
     type: object
@@ -251,4 +253,14 @@ paths:
       summary: Update an existing user
       tags:
       - user
+security:
+- BearerAuth: []
+securityDefinitions:
+  BasicAuth:
+    type: basic
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

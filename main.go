@@ -49,6 +49,12 @@ func init() {
 // @contact.name   Ali
 // @contact.url    https://github.com/FakirHerif/Go-Web-Service
 // @contact.email  alibasdemir@gmail.com
+// @Security BearerAuth
+// @securityDefinitions.basic BasicAuth
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and JWT token.
 func main() {
 
 	r := gin.Default()

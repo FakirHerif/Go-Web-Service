@@ -40,6 +40,15 @@ paths:
       consumes:
       - application/json
       description: Get persons list from the database
+      parameters:
+      - description: Page number for pagination (default is 1)
+        in: query
+        name: page
+        type: integer
+      - description: Number of items per page (default is 20)
+        in: query
+        name: pageSize
+        type: integer
       produces:
       - application/json
       responses:
@@ -47,7 +56,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.Person'
-      summary: Get a list of 20 persons
+      summary: Get a list of persons with pagination
       tags:
       - person
     options:

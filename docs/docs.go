@@ -31,7 +31,21 @@ const docTemplate = `{
                 "tags": [
                     "person"
                 ],
-                "summary": "Get a list of 20 persons",
+                "summary": "Get a list of persons with pagination",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number for pagination (default is 1)",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of items per page (default is 20)",
+                        "name": "pageSize",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",

@@ -37,11 +37,13 @@ type User struct {
 	Role     string `json:"role"`
 }
 
-// @Summary Get a list of 20 persons
+// @Summary Get a list of persons with pagination
 // @Description Get persons list from the database
 // @Tags person
 // @Accept json
 // @Produce json
+// @Param page query int false "Page number for pagination (default is 1)"
+// @Param pageSize query int false "Number of items per page (default is 20)"
 // @Success 200 {object} Person
 // @Router /api/v1/person [get]
 func GetPersons(limit, offset int) ([]Person, error) {

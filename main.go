@@ -73,17 +73,17 @@ func main() {
 	v1 := r.Group("/api/v1")
 
 	{
-		v1.GET("person", getPersons)
-		v1.GET("person/:id", getPersonById)
-		v1.POST("person", addPerson)
-		v1.PUT("person/:id", updatePerson)
-		v1.DELETE("person/:id", deletePerson)
-		v1.OPTIONS("person", options)
-		v1.GET("/user", getUsers)
-		v1.GET("/user/:id", getUserByID)
-		v1.POST("/user", addUser)
-		v1.PUT("/user/:id", updateUser)
-		v1.DELETE("/user/:id", deleteUser)
+		v1.GET("person", auth.TokenAuthMiddleware(), getPersons)
+		v1.GET("person/:id", auth.TokenAuthMiddleware(), getPersonById)
+		v1.POST("person", auth.TokenAuthMiddleware(), addPerson)
+		v1.PUT("person/:id", auth.TokenAuthMiddleware(), updatePerson)
+		v1.DELETE("person/:id", auth.TokenAuthMiddleware(), deletePerson)
+		v1.OPTIONS("person", auth.TokenAuthMiddleware(), options)
+		v1.GET("/user", auth.TokenAuthMiddleware(), getUsers)
+		v1.GET("/user/:id", auth.TokenAuthMiddleware(), getUserByID)
+		v1.POST("/user", auth.TokenAuthMiddleware(), addUser)
+		v1.PUT("/user/:id", auth.TokenAuthMiddleware(), updateUser)
+		v1.DELETE("/user/:id", auth.TokenAuthMiddleware(), deleteUser)
 	}
 
 	err := models.ConnectDatabase()

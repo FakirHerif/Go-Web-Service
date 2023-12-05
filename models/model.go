@@ -292,7 +292,7 @@ func GetUserByID(userID int) (User, error) {
 // @Success 200 {integer} integer
 // @Router /api/v1/user [post]
 func CreateUser(newUser User) (int64, error) {
-	if newUser.Role == "" {
+	if newUser.Role != "user" {
 		newUser.Role = "user"
 	}
 
@@ -319,6 +319,10 @@ func CreateUser(newUser User) (int64, error) {
 // @Success 200 {string} string
 // @Router /api/v1/user/{id} [put]
 func UpdateUser(updatedUser User) error {
+	if updatedUser.Role == "" {
+		updatedUser.Role = "user"
+	}
+
 	var count int
 	err := DB.QueryRow("SELECT COUNT(*) FROM user WHERE id = ?", updatedUser.ID).Scan(&count)
 	if err != nil {

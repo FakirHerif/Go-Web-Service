@@ -19,6 +19,7 @@ type Credentials struct {
 
 type Claims struct {
 	Username string `json:"username"`
+	Role     string `json:"role"`
 	jwt.StandardClaims
 }
 
@@ -52,6 +53,7 @@ func Login(c *gin.Context) {
 	expirationTime := time.Now().Add(10 * time.Hour)
 	claims := &Claims{
 		Username: creds.Username,
+		Role:     foundUser.Role,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 		},
@@ -84,14 +86,14 @@ func TokenAuthMiddleware() gin.HandlerFunc {
 			return jwtKey, nil
 		})
 
-		if err != nil {
+		if err != nil || !token.Valid {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "GEÇERSİZ TOKEN"})
 			c.Abort()
 			return
 		}
 
-		if !token.Valid {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "GEÇERSİZ TOKEN"})
+		if (c.Request.Method == "DELETE" || c.Request.Method == "PUT") && claims.Role != "admin" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Yetkisiz İşlem"})
 			c.Abort()
 			return
 		}

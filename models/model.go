@@ -2,7 +2,7 @@ package models
 
 import (
 	"database/sql"
-	"strconv"
+	"fmt"
 
 	"errors"
 
@@ -44,10 +44,11 @@ type User struct {
 // @Produce json
 // @Success 200 {object} Person
 // @Router /api/v1/person [get]
-func GetPersons(count int) ([]Person, error) {
+func GetPersons(limit, offset int) ([]Person, error) {
 
-	rows, err := DB.Query("SELECT id, first_name, last_name, email, ip_address from people LIMIT " + strconv.Itoa(count))
+	query := fmt.Sprintf("SELECT id, first_name, last_name, email, ip_address FROM people LIMIT %d OFFSET %d", limit, offset)
 
+	rows, err := DB.Query(query)
 	if err != nil {
 		return nil, err
 	}
@@ -376,4 +377,16 @@ func DeleteUser(userID int) error {
 	}
 
 	return nil
+}
+
+func GetTotalPersonsCount() (int, error) {
+	var count int
+	query := "SELECT COUNT(*) FROM people"
+
+	err := DB.QueryRow(query).Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
 }

@@ -114,18 +114,47 @@ func getPersons(c *gin.Context) {
 
 	start := time.Now()
 
+	pageStr := c.DefaultQuery("page", "1")
+	pageSizeStr := c.DefaultQuery("pageSize", "20")
+
+	page, err := strconv.Atoi(pageStr)
+	if err != nil || page <= 0 {
+		page = 1
+	}
+
+	pageSize, err := strconv.Atoi(pageSizeStr)
+	if err != nil || pageSize <= 0 {
+		pageSize = 20
+	}
+
+	totalPersons, err := models.GetTotalPersonsCount() // Veritabanındaki toplam person
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Sunucu hatası: Kişi verileri alınamadı"})
+		return
+	}
+	totalPages := totalPersons / pageSize
+	if totalPersons%pageSize != 0 {
+		totalPages++
+	}
+
+	if page > totalPages {
+		page = totalPages // Kullanıcının girdiği sayfa numarası toplam sayfa numarasından büyükse mevcut olan en son sayfayı getir
+	}
+
 	var wg sync.WaitGroup
 	wg.Add(1)
 
 	go handleRequest(func(c *gin.Context) {
-		persons, err := models.GetPersons(20)
+		offset := (page - 1) * pageSize
+		persons, err := models.GetPersons(pageSize, offset)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"Hata": "Veritabanından kişiler alınamadı"})
 			crudOperations.WithLabelValues("GET", "error").Inc()
 			return
 		}
 
-		if persons == nil {
+		if len(persons) == 0 {
 			c.JSON(http.StatusBadRequest, gin.H{"Hata": "Kayıt bulunamadı"})
 			crudOperations.WithLabelValues("GET", "not_found").Inc()
 			return

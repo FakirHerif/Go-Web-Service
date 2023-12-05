@@ -238,9 +238,11 @@ func DeletePerson(personId int) (bool, error) {
 // @Produce json
 // @Success 200 {object} User
 // @Router /api/v1/user [get]
-func GetUsers() ([]User, error) {
-	rows, err := DB.Query("SELECT id, username, email, password, role FROM user")
+func GetUsers(limit, offset int) ([]User, error) {
 
+	query := fmt.Sprintf("SELECT id, username, email, password, role FROM user LIMIT %d OFFSET %d", limit, offset)
+
+	rows, err := DB.Query(query)
 	if err != nil {
 		return nil, err
 	}
@@ -391,4 +393,35 @@ func GetTotalPersonsCount() (int, error) {
 	}
 
 	return count, nil
+}
+
+func GetTotalUsersCount() (int, error) {
+	var count int
+	query := "SELECT COUNT(*) FROM user"
+
+	err := DB.QueryRow(query).Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
+func GetUserByUsernameAndPassword(username, password string) (User, error) {
+	var user User
+	query := "SELECT id, username, email, password, role FROM user WHERE username = ? LIMIT 1"
+
+	err := DB.QueryRow(query, username).Scan(&user.ID, &user.Username, &user.Email, &user.Password, &user.Role)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return user, errors.New("kullanıcı bulunamadı")
+		}
+		return user, fmt.Errorf("kullanıcı verileri alınırken hata oluştu: %v", err)
+	}
+
+	if user.Password != password {
+		return user, errors.New("şifre yanlış")
+	}
+
+	return user, nil
 }

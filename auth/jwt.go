@@ -30,30 +30,25 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	users, err := models.GetUsers()
+	user, err := models.GetUserByUsernameAndPassword(creds.Username, creds.Password)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "KULLANICI VERİLERİ ALIRKEN HATA OLUŞTU"})
-		return
-	}
-
-	var foundUser models.User
-	for _, user := range users {
-		if user.Username == creds.Username {
-			foundUser = user
-			break
+		if err.Error() == "kullanıcı bulunamadı" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "KULLANICI BULUNAMADI"})
+			return
+		} else if err.Error() == "şifre yanlış" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "ŞİFRE YANLIŞ"})
+			return
 		}
-	}
-
-	// Kullanıcı bulunamadıysa veya şifre eşleşmiyorsa hata ver
-	if foundUser.Username == "" || foundUser.Password != creds.Password {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "ID VEYA ŞİFRE YANLIŞ."})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "BİLİNMEYEN HATA"})
 		return
 	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "BAŞARILI GİRİŞ", "user": user})
 
 	expirationTime := time.Now().Add(10 * time.Hour)
 	claims := &Claims{
 		Username: creds.Username,
-		Role:     foundUser.Role,
+		Role:     user.Role,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 		},

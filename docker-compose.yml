@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  go-web-service:
+    image: webservice
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: go-web-service
+    ports:
+      - "8080:8080"
+    command: /Application/go-web-service
+    restart: always
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin

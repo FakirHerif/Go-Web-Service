@@ -50,7 +50,6 @@ func init() {
 // @contact.url    https://github.com/FakirHerif/Go-Web-Service
 // @contact.email  alibasdemir@gmail.com
 // @Security BearerAuth
-// @securityDefinitions.basic BasicAuth
 // @securityDefinitions.apikey BearerAuth
 // @in header
 // @name Authorization

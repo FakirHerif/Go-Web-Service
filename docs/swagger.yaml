@@ -1,5 +1,12 @@
 basePath: /
 definitions:
+  auth.Credentials:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
   models.Person:
     properties:
       email:
@@ -271,11 +278,25 @@ paths:
       summary: Update an existing user
       tags:
       - user
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Allows users to log in with their credentials
+      parameters:
+      - description: User credentials
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/auth.Credentials'
+      produces:
+      - application/json
+      responses: {}
+      summary: User Login
 security:
 - BearerAuth: []
 securityDefinitions:
-  BasicAuth:
-    type: basic
   BearerAuth:
     description: Type "Bearer" followed by a space and JWT token.
     in: header

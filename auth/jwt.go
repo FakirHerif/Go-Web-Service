@@ -23,6 +23,12 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
+// @Summary User Login
+// @Description Allows users to log in with their credentials
+// @Accept json
+// @Produce json
+// @Param input body Credentials true "User credentials"
+// @Router /login [post]
 func Login(c *gin.Context) {
 	var creds Credentials
 	if err := c.ShouldBindJSON(&creds); err != nil {
@@ -43,7 +49,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "BAŞARILI GİRİŞ", "user": user})
+	c.JSON(http.StatusOK, gin.H{"message": "BAŞARILI GİRİŞ"})
 
 	expirationTime := time.Now().Add(10 * time.Hour)
 	claims := &Claims{

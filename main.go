@@ -21,6 +21,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"example.com/webservice/auth"
+
+	"github.com/gin-contrib/cors"
 )
 
 var (
@@ -57,6 +59,13 @@ func init() {
 func main() {
 
 	r := gin.Default()
+
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"*"} // İZİN VERİLEN URL'LER (TÜMÜ)
+	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
+	config.AllowHeaders = []string{"Authorization", "Content-Type"}
+
+	r.Use(cors.New(config))
 
 	r.Use(func(c *gin.Context) {
 		start := time.Now()

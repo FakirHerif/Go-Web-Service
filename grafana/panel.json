@@ -25,7 +25,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "f357c8dc-66b9-4264-bff1-52eec65065ca"
+        "url": "http://prometheus:9090"
       },
       "fieldConfig": {
         "defaults": {
@@ -104,23 +104,23 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "f357c8dc-66b9-4264-bff1-52eec65065ca"
+            "url": "http://prometheus:9090"
           },
           "editorMode": "code",
-          "expr": "crud_operations_total",
+          "expr": "crud_operations_total{instance=\"host.docker.internal:8080\"}",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Panel Title",
+      "title": "CRUD operations",
       "type": "timeseries"
     },
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "f357c8dc-66b9-4264-bff1-52eec65065ca"
+        "url": "http://prometheus:9090"
       },
       "fieldConfig": {
         "defaults": {
@@ -199,23 +199,23 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "f357c8dc-66b9-4264-bff1-52eec65065ca"
+            "url": "http://prometheus:9090"
           },
           "editorMode": "code",
-          "expr": "http_request_duration_seconds_bucket",
+          "expr": "http_request_duration_seconds_bucket{instance=\"host.docker.internal:8080\"}",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Panel Title",
+      "title": "Http Request Duration",
       "type": "timeseries"
     },
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "f357c8dc-66b9-4264-bff1-52eec65065ca"
+        "url": "http://prometheus:9090"
       },
       "fieldConfig": {
         "defaults": {
@@ -264,7 +264,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "f357c8dc-66b9-4264-bff1-52eec65065ca"
+            "url": "http://prometheus:9090"
           },
           "editorMode": "code",
           "expr": "process_cpu_seconds_total",
@@ -274,13 +274,13 @@
           "refId": "A"
         }
       ],
-      "title": "Panel Title",
+      "title": "CPU Process",
       "type": "piechart"
     },
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "f357c8dc-66b9-4264-bff1-52eec65065ca"
+        "url": "http://prometheus:9090"
       },
       "fieldConfig": {
         "defaults": {
@@ -359,23 +359,23 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "f357c8dc-66b9-4264-bff1-52eec65065ca"
+            "url": "http://prometheus:9090"
           },
           "editorMode": "code",
-          "expr": "prometheus_http_requests_total",
+          "expr": "prometheus_http_requests_total{instance=\"host.docker.internal:8080\"}",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Panel Title",
+      "title": "Total Http Requests",
       "type": "timeseries"
     },
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "f357c8dc-66b9-4264-bff1-52eec65065ca"
+        "url": "http://prometheus:9090"
       },
       "fieldConfig": {
         "defaults": {
@@ -454,7 +454,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "f357c8dc-66b9-4264-bff1-52eec65065ca"
+            "url": "http://prometheus:9090"
           },
           "editorMode": "code",
           "expr": "scrape_duration_seconds",
@@ -464,13 +464,13 @@
           "refId": "A"
         }
       ],
-      "title": "Panel Title",
+      "title": "Request Duration",
       "type": "timeseries"
     },
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "f357c8dc-66b9-4264-bff1-52eec65065ca"
+        "url": "http://prometheus:9090"
       },
       "fieldConfig": {
         "defaults": {
@@ -521,23 +521,23 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "f357c8dc-66b9-4264-bff1-52eec65065ca"
+            "url": "http://prometheus:9090"
           },
           "editorMode": "code",
-          "expr": "prometheus_tsdb_data_replay_duration_seconds",
+          "expr": "prometheus_tsdb_data_replay_duration_seconds{instance=\"host.docker.internal:8080\"}",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Panel Title",
+      "title": "Replay Duration",
       "type": "stat"
     },
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "f357c8dc-66b9-4264-bff1-52eec65065ca"
+        "url": "http://prometheus:9090"
       },
       "fieldConfig": {
         "defaults": {
@@ -588,23 +588,23 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "f357c8dc-66b9-4264-bff1-52eec65065ca"
+            "url": "http://prometheus:9090"
           },
           "editorMode": "code",
-          "expr": "process_virtual_memory_bytes",
+          "expr": "process_virtual_memory_bytes{instance=\"host.docker.internal:8080\"}",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Panel Title",
+      "title": "Virtual Memory",
       "type": "stat"
     },
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "f357c8dc-66b9-4264-bff1-52eec65065ca"
+        "url": "http://prometheus:9090"
       },
       "fieldConfig": {
         "defaults": {
@@ -666,23 +666,23 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "f357c8dc-66b9-4264-bff1-52eec65065ca"
+            "url": "http://prometheus:9090"
           },
           "editorMode": "code",
-          "expr": "promhttp_metric_handler_requests_total",
+          "expr": "promhttp_metric_handler_requests_total{instance=\"host.docker.internal:8080\"}",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Panel Title",
+      "title": "Metric Handler Total Requests",
       "type": "state-timeline"
     },
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "f357c8dc-66b9-4264-bff1-52eec65065ca"
+        "url": "http://prometheus:9090"
       },
       "fieldConfig": {
         "defaults": {
@@ -732,23 +732,23 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "f357c8dc-66b9-4264-bff1-52eec65065ca"
+            "url": "http://prometheus:9090"
           },
           "editorMode": "code",
-          "expr": "go_goroutines",
+          "expr": "go_goroutines{instance=\"host.docker.internal:8080\"}",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Panel Title",
+      "title": "Goroutines Metrics",
       "type": "gauge"
     },
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "f357c8dc-66b9-4264-bff1-52eec65065ca"
+        "url": "http://prometheus:9090"
       },
       "fieldConfig": {
         "defaults": {
@@ -810,17 +810,17 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "f357c8dc-66b9-4264-bff1-52eec65065ca"
+            "url": "http://prometheus:9090"
           },
           "editorMode": "code",
-          "expr": "go_memstats_other_sys_bytes",
+          "expr": "go_memstats_other_sys_bytes{instance=\"host.docker.internal:8080\"}",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Panel Title",
+      "title": "Go Memory Status",
       "type": "heatmap"
     }
   ],

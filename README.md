@@ -35,7 +35,7 @@ password: admin
 
 This live preview provides an interactive interface to explore and interact with the API endpoints implementing CRUD (Create, Read, Update, Delete, Options) operations. Navigate through the available endpoints, execute requests, and observe the API's behavior in real-time with Swagger.
 
-[<h2>Explore by clicking here.</h2>](https://goproject.fly.dev/docs/index.html#) 
+[Explore by clicking here.](https://goproject.fly.dev/docs/index.html#) 
 
 To obtain a token, enter the login credentials with
 ```
